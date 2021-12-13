@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+    <!-- build:css -->
+    <link href="/static/lib/kitadmin/css/layui.css" rel="stylesheet" th:href="@{/lib/kitadmin/css/layui.css}">
+    <link href="/static/lib/kitadmin/css/theme/default.css" id="theme" rel="stylesheet"
+          th:href="@{/lib/kitadmin/css/theme/default.css}">
+    <link href="/static/lib/kitadmin/css/nprogress.css" rel="stylesheet" th:href="@{/lib/kitadmin/css/nprogress.css}">
+    <!-- endbuild -->
+    <style>
+        .eleTree {
+            width: 350px;
+            height: 500px;
+            border: 1px solid #ccc;
+            overflow: hidden;
+            display: inline-block;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <form class="layui-form" lay-filter="form-role-data" th:object="${role}">
+        <input id="roleId" name="roleId" th:field="*{roleId}" type="hidden"/>
+        <div class="layui-form-item">
+            <label class="layui-form-label">角色名称：</label>
+            <div class="layui-input-block">
+                <input autocomplete="off" class="layui-input" name="roleName" readonly th:field="*{roleName}"
+                       type="text"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">权限字符：</label>
+            <div class="layui-input-block">
+                <input autocomplete="off" class="layui-input" name="roleKey" readonly th:field="*{roleKey}"
+                       type="text"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态：</label>
+            <div class="layui-input-inline">
+                <select id="dataScope" lay-filter="dataScope" name="dataScope">
+                    <option th:field="*{dataScope}" value="1">全部数据权限</option>
+                    <option th:field="*{dataScope}" value="2">自定数据权限</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item" id="dataScopeDiv" style="display:none">
+            <label class="layui-form-label">数据权限：</label>
+            <div class="layui-input-block">
+                <div class="eleTree ele1" id="deptTrees" lay-filter="deptTrees"></div>
+            </div>
+        </div>
+        <button class="layui-btn" id="btn-add" lay-filter="btn-add" lay-submit style="display:none">创建</button>
+    </form>
+</div>
+<script src="../static/lib/kitadmin/polyfill.min.js" th:src="@{/lib/kitadmin/polyfill.min.js}"></script>
+<script src="../static/lib/kitadmin/layui.js" th:src="@{/lib/kitadmin/layui.js}"></script>
+<script src="../static/lib/kitadmin/kitadmin.js" th:src="@{/lib/kitadmin/kitadmin.js}"></script>
+
+<script th:inline="javascript">
+    var ctx = [[@{/}]];
+    var editFlag = [[${@permission.hasPermi('system:role:add')}]];
+    var prefix = ctx + "system/role";
+    var dataScopeFlag = [[${role.dataScope}]];
+
+</script>
+<script>
+    layui.config({
+        base: ctx + 'js/admin/role/'
+    }).use(['rule'], function(){
+        var rule = layui.rule;
+        rule.init({
+            "prefix":prefix,
+            "ctx":ctx,
+            "editFlag":editFlag,
+            "dataScopeFlag":dataScopeFlag
+        });
+    });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+    <!-- build:css -->
+    <link href="/static/lib/kitadmin/css/layui.css" rel="stylesheet" th:href="@{/lib/kitadmin/css/layui.css}">
+    <link href="/static/lib/kitadmin/css/theme/default.css" id="theme"
+          rel="stylesheet" th:href="@{/lib/kitadmin/css/theme/default.css}">
+    <link href="/static/lib/kitadmin/css/nprogress.css" rel="stylesheet"
+          th:href="@{/lib/kitadmin/css/nprogress.css}">
+    <!-- endbuild -->
+    <style>
+        .eleTree {
+            width: 350px;
+            height: 500px;
+            border: 1px solid #ccc;
+            overflow: hidden;
+            display: inline-block;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <form class="layui-form" lay-filter="form-menu" th:object="${menu}">
+        <input id="menuId" name="menuId" th:field="*{menuId}" type="hidden"/>
+        <div class="layui-form-item">
+            <label class="layui-form-label">菜单名称：</label>
+            <div class="layui-input-block">
+                <input autocomplete="off" class="layui-input" name="menuName" placeholder="" th:field="*{menuName}"
+                       type="text"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">显示顺序：</label>
+            <div class="layui-input-block">
+                <input autocomplete="off" class="layui-input" name="orderNum" placeholder="" th:field="*{orderNum}"
+                       type="text"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">请求地址：</label>
+            <div class="layui-input-block">
+                <input autocomplete="off" class="layui-input" name="url" placeholder="" th:field="*{url}"
+                       type="text"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">菜单类型：</label>
+            <div class="layui-input-block">
+                <input name="menuType" th:field="*{menuType}" title="目录" type="radio" value="M"/>
+                <input name="menuType" th:field="*{menuType}" title="菜单" type="radio" value="C"/>
+                <input name="menuType" th:field="*{menuType}" title="按钮" type="radio" value="F"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">菜单状态：</label>
+            <div class="layui-input-block">
+                        <span th:each="dict : ${@dict.getType('sys_show_hide')}">
+                            <input name="visible" th:field="*{visible}" th:id="${dict.dictCode}"
+                                   th:title="${dict.dictLabel}" th:value="${dict.dictValue}" type="radio"/>
+                        </span>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">权限标识：</label>
+            <div class="layui-input-block">
+                <input autocomplete="off" class="layui-input" name="perms" placeholder="" th:field="*{perms}"
+                       type="text"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">菜单图标：</label>
+            <div class="layui-input-block">
+                <input autocomplete="off" class="layui-input" name="icon" placeholder="" th:field="*{icon}"
+                       type="text"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">备注：</label>
+            <div class="layui-input-block">
+                <input autocomplete="off" class="layui-input" name="remark" placeholder="" th:field="*{remark}"
+                       type="text"/>
+            </div>
+        </div>
+        <button class="layui-btn" id="btn-add" lay-filter="btn-add" lay-submit style="display:none">test
+        </button>
+    </form>
+</div>
+<script src="../static/lib/kitadmin/polyfill.min.js" th:src="@{/lib/kitadmin/polyfill.min.js}"></script>
+<script src="../static/lib/kitadmin/layui.js" th:src="@{/lib/kitadmin/layui.js}"></script>
+<script src="../static/lib/kitadmin/kitadmin.js" th:src="@{/lib/kitadmin/kitadmin.js}"></script>
+
+<script th:inline="javascript">
+            var ctx = [[@{
+                /}]];
+                var editFlag = [[${@permission.hasPermi('system:menu:edit')}]];
+                var prefix = ctx + "system/menu";
+
+</script>
+<script>
+            layui.config({
+                base: '/js/admin/menu/'
+            }).use(['add'], function () {
+                var add = layui.add;
+                var _id = document.getElementById("menuId").value;
+                add.init({
+                    "prefix": prefix,
+                    "editFlag": editFlag,
+                    "id": _id
+                });
+            });
+
+</script>
+</body>
+</html>

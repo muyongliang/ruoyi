@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+    <!-- build:css -->
+    <link href="/static/lib/kitadmin/css/layui.css" rel="stylesheet" th:href="@{/lib/kitadmin/css/layui.css}">
+    <link href="/static/lib/kitadmin/css/theme/default.css" id="theme" rel="stylesheet"
+          th:href="@{/lib/kitadmin/css/theme/default.css}">
+    <link href="/static/lib/kitadmin/css/nprogress.css" rel="stylesheet" th:href="@{/lib/kitadmin/css/nprogress.css}">
+    <!-- endbuild -->
+</head>
+<body>
+<div class="container">
+    <form class="layui-form" id="form-user-edit" lay-filter="form-user" th:object="${user}">
+        <input name="userId" th:field="*{userId}" type="hidden"/>
+        <input id="treeId" name="deptId" th:field="*{deptId}" type="hidden"/>
+        <div class="layui-form-item">
+            <label class="layui-form-label">登录名称：</label>
+            <div class="layui-input-block">
+                <input class="layui-input" readonly="true" th:field="*{loginName}" type="text"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">部门名称：</label>
+            <div class="layui-input-block">
+                <input class="layui-input" id="treeName" name="deptName" onclick="selectDeptTree()" readonly="true"
+                       th:field="*{dept.deptName}" type="text">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名称：</label>
+            <div class="layui-input-block">
+                <input class="layui-input" id="userName" name="userName" th:field="*{userName}" type="text">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">邮箱：</label>
+            <div class="layui-input-block">
+                <input class="layui-input" id="email" name="email" th:field="*{email}" type="text">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">手机：</label>
+            <div class="layui-input-block">
+                <input class="layui-input" id="phonenumber" name="phonenumber" th:field="*{phonenumber}" type="text">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">性别：</label>
+            <div class="layui-input-block">
+                <select id="sex" lay-filter="sex" lay-verify="required" th:with="type=${@dict.getType('sys_user_sex')}">
+                    <option th:each="dict : ${type}" th:field="*{sex}" th:text="${dict.dictLabel}"
+                            th:value="${dict.dictValue}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态：</label>
+            <div class="layui-input-block">
+                <div class="onoffswitch">
+                    <input id="status" lay-skin="switch" name="status" th:checked="${user.status == '0' ? false : true}"
+                           type="checkbox">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">岗位：</label>
+            <div class="layui-input-block">
+                <th:block class="check-box" th:each="post,inte:${posts}">
+                    <input lay-skin="primary" th:checked="${post.flag}" th:disabled="${post.status == '1'}"
+                           th:name="'post['+${inte.index}+']'" th:title="${post.postName}" th:value="${post.postId}"
+                           type="checkbox">
+                </th:block>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">角色：</label>
+            <div class="layui-input-block">
+                <th:block class="check-box" th:each="role,inte:${roles}">
+                    <input lay-skin="primary" th:checked="${role.flag}" th:disabled="${role.status == '1'}"
+                           th:name="'role['+${inte.index}+']'" th:title="${role.roleName}" th:value="${role.roleId}"
+                           type="checkbox">
+                </th:block>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-filter="btn-save" lay-submit>保存</button>
+                <button class="layui-btn layui-btn-primary" type="reset">重置</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+<script th:inline="javascript"> var ctx = [[@{/}]]; </script>
+
+<script src="../static/lib/kitadmin/polyfill.min.js" th:src="@{/lib/kitadmin/polyfill.min.js}"></script>
+<script src="../static/lib/kitadmin/layui.js" th:src="@{/lib/kitadmin/layui.js}"></script>
+<script src="../static/lib/kitadmin/kitadmin.js" th:src="@{/lib/kitadmin/kitadmin.js}"></script>
+<script type="text/javascript">
+    layui.config({
+        base: ctx + 'js/'
+    }).use(['element','layer','form','common','jquery'],function(){
+        var $ = layui.$
+            ,element = layui.element
+            ,layer = layui.layer
+            ,form = layui.form
+            ,common = layui.common;
+
+        var index = parent.layer.getFrameIndex(window.name);
+
+        form.render(null, 'form-user');
+        form.on('submit(btn-save)', function(data){
+
+
+            var roleIds = common.getCheckValues("role");
+            var postIds = common.getCheckValues("post");
+            data.field.roleIds = roleIds;
+            data.field.postIds = postIds;
+            data.field.status = data.field.status === "on" ? "1":"0";
+
+            console.log(JSON.stringify(data.field));
+
+            //TODO:提供一个检测表单数据检测性通用方法
+            if(true){
+                $.ajax({
+                    cache : false,
+                    type : "POST",
+                    url : ctx + "system/user/edit",
+                    data : data.field,
+                    async : false,
+                    error : function(request) {
+                        layui.msg("系统错误");
+                    },
+                    success : function(data) {
+                        console.log("success:",data);
+                        if(data.code > 0 ){
+                            layui.msg(data.msg);
+                        }else{
+                            parent.layer.close(index);
+                        }
+                    }
+                });
+            }
+            return false;
+        });
+    });
+
+</script>
+</body>
+</html>

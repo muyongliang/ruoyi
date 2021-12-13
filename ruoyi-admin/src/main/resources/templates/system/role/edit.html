@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+    <!-- build:css -->
+    <link href="/static/lib/kitadmin/css/layui.css" rel="stylesheet" th:href="@{/lib/kitadmin/css/layui.css}">
+    <link href="/static/lib/kitadmin/css/theme/default.css" id="theme" rel="stylesheet"
+          th:href="@{/lib/kitadmin/css/theme/default.css}">
+    <link href="/static/lib/kitadmin/css/nprogress.css" rel="stylesheet" th:href="@{/lib/kitadmin/css/nprogress.css}">
+    <!-- endbuild -->
+    <style>
+        .eleTree {
+            width: 500px;
+            height: 500px;
+            border: 1px solid #ccc;
+            overflow: scroll;
+            display: inline-block;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <form class="layui-form" lay-filter="form-role" th:object="${role}">
+        <input id="roleId" name="roleId" th:field="*{roleId}" type="hidden"/>
+        <div class="layui-form-item">
+            <label class="layui-form-label">角色名称：</label>
+            <div class="layui-input-block">
+                <input autocomplete="off" class="layui-input" name="roleName" th:field="*{roleName}" type="text"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">权限字符：</label>
+            <div class="layui-input-block">
+                <input autocomplete="off" class="layui-input" name="roleKey" th:field="*{roleKey}" type="text"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">显示顺序：</label>
+            <div class="layui-input-block">
+                <input autocomplete="off" class="layui-input" id="roleSort" name="roleSort" th:field="*{roleSort}"
+                       type="text" value="99"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否冻结：</label>
+            <div class="layui-input-block">
+                <div class="onoffswitch">
+                    <input id="status" lay-skin="switch" name="status" th:checked="${role.status == '1' ? true : false}"
+                           type="checkbox">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">备注：</label>
+            <div class="layui-input-block">
+                <textarea class="layui-textarea" id="remark" name="remark">[[${role.remark}]]</textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">菜单权限：</label>
+            <div class="layui-input-block">
+                <div class="eleTree ele1" id="menuTrees" lay-filter="treeMenu"></div>
+            </div>
+        </div>
+        <button class="layui-btn" id="btn-add" lay-filter="btn-add" lay-submit style="display:none">创建</button>
+    </form>
+</div>
+<script src="../static/lib/kitadmin/polyfill.min.js" th:src="@{/lib/kitadmin/polyfill.min.js}"></script>
+<script src="../static/lib/kitadmin/layui.js" th:src="@{/lib/kitadmin/layui.js}"></script>
+<script src="../static/lib/kitadmin/kitadmin.js" th:src="@{/lib/kitadmin/kitadmin.js}"></script>
+
+<script th:inline="javascript">
+	var ctx = [[@{/}]];
+	var editFlag = [[${@permission.hasPermi('system:role:add')}]];
+	var prefix = ctx + "system/role";
+
+</script>
+<script>
+	layui.config({
+		base: '/js/admin/role/'
+	}).use(['add'], function(){
+		var add = layui.add;
+		var _roleId = document.getElementById("roleId").value;
+		add.init({
+			"prefix":prefix,
+			"editFlag":editFlag,
+			"id":_roleId
+		});
+	});
+
+</script>
+</body>
+</html>
